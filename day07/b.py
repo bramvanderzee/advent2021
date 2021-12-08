@@ -19,14 +19,11 @@ with open(fn) as f:
 
 average = round(sum(nums) / len(nums))
 
-best_fuel = None
+best_fuel = 1e9
 best_pos = 0
 for pos in range(0, max(nums)):
     f = fuel_use(pos, nums)
-    if not best_fuel:
-        best_fuel = f
-        best_pos = pos
-    elif f < best_fuel:
+    if f < best_fuel:
         best_fuel = f
         best_pos = pos
 
