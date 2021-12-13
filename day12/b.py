@@ -9,28 +9,26 @@ with open(fn) as f:
         G[first].append(second)
         G[second].append(first)
 
-routes = [] 
 to_double = [n for n in G.keys() if n.lower() == n and not n == 'start' and not n == 'end']
 
 print(len(to_double))
 i = 0
+routes = defaultdict(list)
 for double in reversed(to_double):
     i += 1
     print(i, double)
-    doubles = [n for n in to_double if n != double]
-    doubles.extend(['start', 'end'])
     Q = deque([['start']])
     path = ['start']
     while Q:
         path = Q.popleft()
-        if path in routes:
+        if path in routes[len(path)]:
             continue
         if path[-1] == 'end':
-            routes.append(path)
+            routes[len(path)].append(path)
             continue
         
         for n in G[path[-1]]:
-            if not (n in doubles and n in path):
+            if n == double or not (n.lower() == n and n in path):
                 if n == double:
                     if path.count(double) < 2:
                         to_check = path.copy()
@@ -40,5 +38,5 @@ for double in reversed(to_double):
                     to_check = path.copy()
                     to_check.append(n)
                     Q.append(to_check)
-    print(len(routes))
-print(len(routes))
+    print(sum([len(v) for v in routes.values()]))
+print(sum([len(v) for v in routes.values()]))
