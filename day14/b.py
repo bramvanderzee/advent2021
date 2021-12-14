@@ -35,13 +35,13 @@ pairs = defaultdict(int)
 for i in range(1, len(template)):
     pairs[template[i-1] + template[i]] += 1
 
-for _ in range(10):
+for i in range(40):
+    print(i)
     pairs = cycle(pairs, P)
 
 print(pairs)
 C = defaultdict(int)
 for n, v in pairs.items():
     C[n[0]] += v
-C[n[1]] += v
 print(max(C.values()), min(C.values()))
-print(max(C.values()) - min(C.values()))
+print(max(C.values()) - min(C.values()) + 1)
