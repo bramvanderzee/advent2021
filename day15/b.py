@@ -80,7 +80,6 @@ closed_nodes = []
 while open_nodes:
     _, node = open_nodes.get()
     closed_nodes.append(node)
-    print(node.x, node.y)
     seen[(node.x, node.y)] = True
     if node == M[(mx, my)]:
         break
