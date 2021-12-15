@@ -2,13 +2,6 @@ import sys
 from collections import defaultdict, deque
 import queue
 
-D = {
-    (0, 1): 'N',
-    (1, 0): 'E',
-    (0, -1): 'S',
-    (-1, 0): 'W'
-}
-
 class Node:
     def __init__(self, x, y, g):
         self.x = x
@@ -25,7 +18,7 @@ class Node:
             return self.g
 
     def __lt__(self, other):
-        return self.gt < other.gt
+        return self.cost() < other.cost()
     
     def __eq__(self, other):
         if self.x == other.x and self.y == other.y:
@@ -55,7 +48,7 @@ print('Size:', mx, my)
 def calc_heuristic(from_c, to_c) -> int:
     x1, y1 = from_c
     x2, y2 = to_c
-    return pow(x2-x1, 2)+pow(y2-y1, 2) # euclidian distance
+    return (pow(x2-x1, 2)+pow(y2-y1, 2))//100
 
 print('Getting adjacents...')
 for node in M.values():
@@ -80,6 +73,7 @@ closed_nodes = []
 while open_nodes:
     _, node = open_nodes.get()
     closed_nodes.append(node)
+    print(node.x, node.y, node.cost(), node.gt)
     seen[(node.x, node.y)] = True
     if node == M[(mx, my)]:
         break
