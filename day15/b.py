@@ -2,6 +2,8 @@ import sys
 from collections import defaultdict, deque
 import queue
 
+sys.setrecursionlimit(int(1e6))
+
 class Node:
     def __init__(self, x, y, g):
         self.x = x
@@ -41,8 +43,8 @@ with open(fn) as f:
                     cost = int(c)
                     cost += dx + dy
                     if cost > 9:
-                        cost -= 9
-                    M[(x + dx * W, y + dy * H)] = Node(x + dx * W, y + dy * H, int(cost))
+                        cost = cost%9
+                    M[(x + dx * W, y + dy * H)] = int(cost)
 print('Size:', mx, my)
 
 def calc_heuristic(from_c, to_c) -> int:
@@ -50,40 +52,45 @@ def calc_heuristic(from_c, to_c) -> int:
     x2, y2 = to_c
     return (pow(x2-x1, 2)+pow(y2-y1, 2))//100
 
-print('Getting adjacents...')
-for node in M.values():
-    node.h = calc_heuristic((node.x, node.y), (mx, my))
-    adj = []
-    for dy in [-1, 1]:
-        c = (node.x, node.y + dy)
-        if c in M:
-            adj.append(M[c])
-    for dx in [-1, 1]:
-        c = (node.x + dx, node.y)
-        if c in M:
-            adj.append(M[c])
-    node.adj.extend(adj)
+H = {}
+print('Calculating heuristics...')
+for k, v in M.items():
+    x, y = k
+    H[k] = calc_heuristic((x, y), (mx, my))
 
+C = defaultdict(lambda: int(1e9))
 print('Calculating route...')
-M[(0, 0)].gt = 0
-seen = defaultdict(bool)
-open_nodes = queue.PriorityQueue()
-open_nodes.put((0, M[(0, 0)]))
-closed_nodes = []
-while open_nodes:
-    _, node = open_nodes.get()
-    closed_nodes.append(node)
-    print(node.x, node.y, node.cost(), node.gt)
-    seen[(node.x, node.y)] = True
-    if node == M[(mx, my)]:
-        break
-    adj = [n for n in node.adj if not seen[(n.x, n.y)]]
-    for n in adj:
-        if n.gt:
-            if n.gt < node.gt + n.g:
-                continue
-        n.gt = node.gt + n.g
-        open_nodes.put((n.gt, n))
+def step(state):
+    global M,C
+    node, path = state
+    new_path = set(path)
+    new_path.add(node)
+    
+    cost = 0
+    for n in new_path:
+        cost += M[n]
+    if cost < C[node]:
+        C[node] = cost
 
-print('Calculating cost')
-print(M[(mx, my)].gt)
+    print(node, C[node])
+
+    if node == (mx, my):
+        print(C[node])
+        sys.exit()
+
+    adj = []
+    x, y = node
+    for dy in [-1, 1]:
+        c = (x, y + dy)
+        if c in M:
+            adj.append(c)
+    for dx in [-1, 1]:
+        c = (x + dx, y)
+        if c in M:
+            adj.append(c)
+
+    to_search = sorted(set(adj) - new_path, key=lambda c: H[c])
+    for n in to_search:
+        step((n, new_path))
+
+step(((0, 0), []))
